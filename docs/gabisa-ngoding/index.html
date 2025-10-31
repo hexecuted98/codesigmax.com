@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dokumentasi & Tutorial bahasa Gabisa Ngoding">
+    <link rel="stylesheet" href="hayoo.css">
+    <title>Gabisa Ngoding</title>
+</head>
+<body>
+    <header id="navbar">
+        <nav>
+            <ul>
+                <li><a href="#developer">Pembuat</a></li>
+                <li><a href="#tujuan">Tujuan</a></li>
+                <li><a href="#cara-kerja">Cara Kerja</a></li>
+                <li><a href="#komunitas">Komunitas Kami</a></li>
+                <li><a href="#pembaruan">Pembaruan</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="tujuan">
+            <h1>Apa Itu Gabisa Ngoding?</h1>
+            <p>
+                Jadi gini bro, <b>Gabisa Ngoding</b> itu bukan cuma nama, tapi juga gaya hidup 😎.  
+                Ini tuh bahasa pemrograman parodi dari <i>Brainfuck</i>, tapi versi yang lebih receh dan lokal.  
+                Kalau Brainfuck pakai simbol aneh kayak <code>+ - &lt; &gt; [ ] . ,</code>,  
+                nah Gabisa Ngoding pakai kata-kata yang lebih “manusiawi” kayak <code>puh</code>, <code>sepuh</code>, <code>gabisa</code>, <code>ngoding</code>, dan gengnya.
+            </p>
+        </section>
+
+        <section id="cara-kerja">
+            <h2>Gimana Sih Cara Kerjanya?</h2>
+            <p>
+                Oke, sekarang kita bahas dengan serius tapi santai.  
+                Jadi bayangin lo punya otak berupa <b>array memori</b> isinya 30.000 slot kosong, semua diisi angka nol.
+            </p>
+
+            <p>
+                Terus lo punya satu <b>pointer</b>, alias jarum yang nunjuk ke salah satu slot itu.  
+                Nah, setiap perintah di Gabisa Ngoding (alias di Brainfuck) itu mainin jarum dan angka-angka di memori itu.
+            </p>
+
+            <h3>Perintah Dasar</h3>
+            <ul>
+                <li><code>gw</code> → Geser jarum ke kanan (kayak &gt; di Brainfuck)</li>
+                <li><code>woy</code> → Geser jarum ke kiri (kayak &lt;)</li>
+                <li><code>gabisa</code> → Tambah angka di memori sekarang (kayak +)</li>
+                <li><code>ngoding</code> → Kurangin angka di memori sekarang (kayak -)</li>
+                <li><code>dong</code> → Cetak karakter dari angka di memori sekarang (kayak .)</li>
+                <li><code>ajarin</code> → Minta input karakter dari user (kayak ,)</li>
+                <li><code>puh</code> → Mulai loop, alias “selama nilai sekarang gak nol, ulangi bloknya” (kayak [)</li>
+                <li><code>sepuh</code> → Akhir loop, balik lagi kalau kondisi belum nol (kayak ])</li>
+            </ul>
+
+            <h3>Ilustrasi Singkat</h3>
+            <pre><code>
+gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa
+gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa 
+gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa 
+gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa
+gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa gabisa dong
+            </code></pre>
+
+            <p>
+                Nih artinya:  
+                - Naikin nilai di sel pertama jadi 3 (karena <code>gabisa</code> tiga kali)  
+                - Masuk ke loop <code>puh</code>  
+                - Geser pointer ke kanan (<code>gw</code>)  
+                - Tambah satu (<code>gabisa</code>)  
+                - Tutup loop (<code>sepuh</code>)  
+                - Cetak hasilnya (<code>dong</code>)
+            </p>
+
+            <p>
+                Intinya, kalau Brainfuck itu “komputer yang dikasih makan simbol”,  
+                Gabisa Ngoding itu “komputer yang dikasih makan bahasa ngelantur tapi tetep jalan”.  
+                Dia gak ngambek, cuma… ya, sering bingung aja :v.
+            </p>
+
+            <h3>Skema Kerja Otaknya</h3>
+            <ol>
+                <li>Program dipecah jadi token (kayak kata <code>puh</code>, <code>gw</code>, dsb)</li>
+                <li>Token dikompilasi jadi bytecode (angka-angka simpel)</li>
+                <li>Bytecode dijalankan oleh mesin virtual (VM) yang nyimpen data di array</li>
+                <li>Setiap perintah ubah pointer, isi memori, atau print karakter</li>
+            </ol>
+
+            <p>
+                Jadi ya… <b>Gabisa Ngoding</b> ini kayak <i>Brainfuck yang minum es kopi susu</i> —  
+                sederhana, overthinking, tapi somehow tetep jalan.
+            </p>
+        </section>
+
+        <section id="developer">
+            <h2>Pembuatnya Siapa Nih?</h2>
+            <p>
+                Bahasa ini dibuat oleh <b><a href="https://github.com/hexecuted98">adjidev</a></b>, seorang developer yang sudah gilak
+                seperti professor gila dalam pilem wkwkwk.
+            </p>
+        </section>
+
+        <section id="komunitas">
+            <h2>Komunitas Kami</h2>
+            <p>
+                Mau ikut nyimak bareng sambil belajar sistem virtual machine dan compiler mini?  
+                Gabung aja ke komunitas Gabisa Ngoding di <a href="https://t.me/not2dev">NotDev Foundation</a>
+            </p>
+        </section>
+
+        <section id="pembaruan">
+            <h2>Pembaruan Terbaru</h2>
+            <p>
+                Versi saat ini: <code>0.2.1</code>  
+                - Ngefix bug kecil yang ngambek gamau nampilin error
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Apa aja. Dibuat dengan <span style="color:red">❤</span> dan sedikit kewarasan.</p>
+    </footer>
+
+</body>
+</html>
