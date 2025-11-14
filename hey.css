@@ -1,0 +1,12 @@
+/*font by: alit design*/
+@font-face {
+    font-family: 'Komigo';
+    src: url('komigo.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; 
+}
+
+*, html {
+    
+}

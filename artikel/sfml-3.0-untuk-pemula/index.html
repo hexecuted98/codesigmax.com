@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SFML 3.0 Tutorial - CodeSigmaX</title>
+    <!-- Highlight.js CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Retro';
+            src: url('https://fonts.gstatic.com/s/pressstart2p/v15/e3t5euO_Wr1mefEsqouVsbO3LdcOqFQTwuEm.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'Retro', monospace;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.05) 2px, rgba(255, 255, 255, 0.05) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.05) 2px, rgba(255, 255, 255, 0.05) 4px),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23000" width="100" height="100"/><circle cx="20" cy="20" r="2" fill="%23333"/><circle cx="50" cy="50" r="2" fill="%23333"/><circle cx="80" cy="80" r="2" fill="%23333"/><circle cx="80" cy="20" r="2" fill="%23333"/></svg>');
+            background-attachment: fixed;
+            background-size: 100%, 100%, 100px 100px;
+            min-height: 100vh;
+            color: #00ff41;
+            image-rendering: pixelated;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(90deg, #00ff41 0%, #00d4ff 100%);
+            padding: 15px 0;
+            box-shadow: 0 8px 20px rgba(0, 255, 65, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border: 3px solid #000;
+            border-bottom: 6px solid #000;
+        }
+
+        nav ul {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            list-style: none;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        #title {
+            font-family: 'Retro', monospace;
+            font-size: 2rem;
+            color: #000;
+            text-shadow: 4px 4px 0px rgba(0, 255, 65, 0.5), 8px 8px 0px rgba(0, 212, 255, 0.3);
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+
+        nav a {
+            color: #000;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #000;
+            transition: all 0.1s ease;
+            text-shadow: none;
+            box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5);
+        }
+
+        nav a:hover {
+            background: #ffff00;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5);
+        }
+
+        nav a:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                justify-content: center;
+                gap: 8px;
+            }
+
+            #title {
+                font-size: 1.3rem;
+                width: 100%;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+
+            nav a {
+                font-size: 0.7rem;
+                padding: 6px 8px;
+            }
+        }
+
+        /* Main Content */
+        .content {
+            padding: 40px 20px;
+        }
+
+        .article-header {
+            background: #16213e;
+            border: 3px solid #00ff41;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 8px 8px 0px #00d4ff;
+        }
+
+        .article-header h1 {
+            color: #ffff00;
+            font-size: 2rem;
+            text-shadow: 2px 2px 0px #000;
+            margin-bottom: 15px;
+        }
+
+        .article-header p {
+            color: #00ff41;
+            font-size: 0.95rem;
+            text-shadow: 1px 1px 0px #000;
+            margin-bottom: 10px;
+        }
+
+        .meta-info {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #00d4ff;
+        }
+
+        .meta-item {
+            color: #00d4ff;
+            font-size: 0.85rem;
+            text-shadow: 1px 1px 0px #000;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: #16213e;
+            border: 3px solid #00d4ff;
+            padding: 20px;
+            margin-bottom: 40px;
+            box-shadow: 6px 6px 0px #00ff41;
+        }
+
+        .toc h3 {
+            color: #ffff00;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: #00ff41;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .toc a:hover {
+            color: #ffff00;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        /* Article Sections */
+        .article-section {
+            background: #16213e;
+            border: 3px solid #00ff41;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 6px 6px 0px rgba(0, 212, 255, 0.5);
+        }
+
+        .article-section h2 {
+            color: #ffff00;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0px #000;
+            border-bottom: 3px solid #00d4ff;
+            padding-bottom: 10px;
+        }
+
+        .article-section h3 {
+            color: #00ff41;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 0px #000;
+        }
+
+        .article-section p {
+            color: #00ff41;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 0px #000;
+        }
+
+        .article-section ul {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .article-section li {
+            color: #00ff41;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            text-shadow: 1px 1px 0px #000;
+            position: relative;
+        }
+
+        .article-section li:before {
+            content: "->";
+            position: absolute;
+            left: 0;
+            color: #00d4ff;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #0f1419;
+            border: 3px solid #00d4ff;
+            padding: 0;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: 5px 5px 0px rgba(0, 212, 255, 0.3);
+        }
+
+        .code-label {
+            background: #00d4ff;
+            color: #000;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
+        }
+
+        .hljs {
+            padding: 15px;
+            background: #0f1419 !important;
+            color: #00ff41 !important;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .hljs-attr {
+            color: #00d4ff !important;
+        }
+
+        .hljs-string {
+            color: #ffff00 !important;
+        }
+
+        .hljs-literal {
+            color: #ff6b9d !important;
+        }
+
+        .hljs-number {
+            color: #4ecdc4 !important;
+        }
+
+        .hljs-function {
+            color: #00ff41 !important;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #16213e;
+            border-left: 5px solid #00ff41;
+            border: 3px solid #00ff41;
+            padding: 15px;
+            margin: 20px 0;
+            box-shadow: 4px 4px 0px rgba(0, 255, 65, 0.2);
+        }
+
+        .info-box.warning {
+            border: 3px solid #ffff00;
+            border-left: 5px solid #ffff00;
+            box-shadow: 4px 4px 0px rgba(255, 255, 0, 0.2);
+        }
+
+        .info-box.error {
+            border: 3px solid #ff6b9d;
+            border-left: 5px solid #ff6b9d;
+            box-shadow: 4px 4px 0px rgba(255, 107, 157, 0.2);
+        }
+
+        .info-box p {
+            color: #00ff41;
+            font-size: 0.95rem;
+            text-shadow: 1px 1px 0px #000;
+            margin: 0;
+        }
+
+        .info-box.warning p {
+            color: #ffff00;
+        }
+
+        .info-box.error p {
+            color: #ff6b9d;
+        }
+
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        /* Navigation Links */
+        .article-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .nav-link {
+            flex: 1;
+            background: #16213e;
+            border: 3px solid #00ff41;
+            padding: 20px;
+            text-decoration: none;
+            box-shadow: 5px 5px 0px rgba(0, 255, 65, 0.2);
+            transition: all 0.1s ease;
+        }
+
+        .nav-link:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0px rgba(0, 255, 65, 0.2);
+        }
+
+        .nav-link h4 {
+            color: #00d4ff;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .nav-link p {
+            color: #00ff41;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .article-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .article-section h2 {
+                font-size: 1.2rem;
+            }
+
+            .article-nav {
+                flex-direction: column;
+            }
+
+            .hljs {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="navbar" id="navbar">
+            <nav>
+                <ul>
+                    <h2 id="title">CODESIGMAX</h2>
+                    <li><a href="/index.html#artikel">ARTIKEL</a></li>
+                    <li><a href="/index.html#developer">DEV</a></li>
+                    <li><a href="/index.html#tentang">ABOUT</a></li>
+                    <li><a href="/test.cpp">KONTAK</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="content">
+            <div class="article-header">
+                <h1>[ CARA MENGGUNAKAN SFML 3.0 UNTUK PEMULA ]</h1>
+                <p>Panduan lengkap membuat game 2D dengan SFML 3.0 dari nol hingga mahir!</p>
+                <div class="meta-info">
+                    <span class="meta-item">📅 Publish: 2025</span>
+                    <span class="meta-item">👤 By: @chavyyu</span>
+                    <span class="meta-item">⏱️ Reading Time: 15 min</span>
+                    <span class="meta-item">📊 Level: PEMULA</span>
+                </div>
+            </div>
+
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h3>[ DAFTAR ISI ]</h3>
+                <ul>
+                    <li><a href="#intro">➜ Pengenalan SFML</a></li>
+                    <li><a href="#setup">➜ Setup Environment</a></li>
+                    <li><a href="#first">➜ Program Pertama</a></li>
+                    <li><a href="#window">➜ Membuat Window</a></li>
+                    <li><a href="#graphics">➜ Graphics & Drawing</a></li>
+                    <li><a href="#input">➜ Input Handling</a></li>
+                    <li><a href="#tips">➜ Tips & Tricks</a></li>
+                </ul>
+            </div>
+
+            <!-- Section 1: Pengenalan -->
+            <section class="article-section" id="intro">
+                <h2>[ 01 ] PENGENALAN SFML</h2>
+                <p>SFML (Simple and Fast Multimedia Library) adalah sebuah library C++ yang dirancang untuk membuat game dan aplikasi multimedia dengan mudah. SFML menyediakan interface yang simple dan powerful untuk graphics, audio, networking, dan window management.</p>
+                
+                <h3>> Keuntungan SFML:</h3>
+                <ul>
+                    <li>Mudah dipelajari dan digunakan</li>
+                    <li>Cross-platform (Windows, Linux, macOS)</li>
+                    <li>Dokumentasi lengkap dan komunitas aktif</li>
+                    <li>Performance yang baik untuk game 2D</li>
+                    <li>License yang permissive (free & open source)</li>
+                </ul>
+
+                <div class="info-box">
+                    <p class="info-title">[ INFO ]</p>
+                    <p>SFML versi 3.0 adalah release terbaru yang membawa improvement dan features baru yang lebih modern!</p>
+                </div>
+            </section>
+
+            <!-- Section 2: Setup Environment -->
+            <section class="article-section" id="setup">
+                <h2>[ 02 ] SETUP ENVIRONMENT</h2>
+                <p>Sebelum memulai, pastikan Anda telah menginstall yang diperlukan:</p>
+
+                <h3>> Requirements:</h3>
+                <ul>
+                    <li>C++ Compiler (GCC, Clang, MSVC)</li>
+                    <li>CMake (untuk build system)</li>
+                    <li>SFML 3.0 Library</li>
+                    <li>Text Editor atau IDE (VS Code, Visual Studio, CLion)</li>
+                </ul>
+
+                <h3>> Download SFML 3.0:</h3>
+                <p>Download dari official website: <strong>https://www.sfml-dev.org/</strong></p>
+
+                <div class="code-block">
+                    <div class="code-label">[ BASH ] - Ubuntu/Linux Setup</div>
+                    <pre><code class="language-bash">sudo apt-get install libsfml-dev
+#bangun dari sumber kodenya
+git clone https://github.com/SFML/SFML.git
+cd SFML
+mkdir build && cd build
+cmake ..
+make && sudo make install</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-label">[ POWERSHELL ] - Windows Setup</div>
+                    <pre><code class="language-bash">#Download dari: https://www.sfml-dev.org/download.php
+#Ekstrak ke folder yang mudah diakses, misal: C:\SFML\
+#Set environment variable SFML_CUK ke folder tersebut</code></pre>
+                </div>
+            </section>
+
+            <!-- Section 3: Program Pertama -->
+            <section class="article-section" id="first">
+                <h2>[ 03 ] PROGRAM PERTAMA ANDA</h2>
+                <p>Mari buat program SFML pertama yang menampilkan window kosong. Program ini akan menjadi dasar untuk semua project berikutnya!</p>
+
+                <div class="code-block">
+                    <div class="code-label">[ C++ ] - main.cpp</div>
+                    <pre><code class="language-cpp">#include &lt;SFML/Graphics.hpp&gt;
+
+int main() {
+    //bikin jendela dengan ukuran 800x600 
+    sf::RenderWindow layar(sf::VideoMode(800, 600), "Belajar SFML - PEMULA");
+    
+    //looping
+    while (layar.isOpen()) {
+        //event
+        sf::Event event;
+        while (layar.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                layar.close();
+            }
+        }
+        
+        //latar belakang layarnya
+        layar.clear(sf::Color::Black);
+        
+        //tampilin
+        layar.display();
+    }
+    
+    return 0;
+}</code></pre>
+                </div>
+
+                <div class="info-box warning">
+                    <p class="info-title">[ PENTING ]</p>
+                    <p>Pastikan Anda sudah link SFML library dengan benar di project Anda. Jika ada error saat compile, check kembali path SFML Anda!</p>
+                </div>
+            </section>
+
+            <!-- Section 4: Membuat Window -->
+            <section class="article-section" id="window">
+                <h2>[ 04 ] MEMBUAT WINDOW DENGAN SFML</h2>
+                <p>Window adalah tempat di mana semua graphics akan ditampilkan. Mari pelajari cara membuat dan mengatur window SFML.</p>
+
+                <h3>> Membuat Window Dasar:</h3>
+                <div class="code-block">
+                    <div class="code-label">[ C++ ] - Window Creation</div>
+                    <pre><code class="language-cpp">//Cara 1: Dengan VideoMode
+sf::RenderWindow window(sf::VideoMode(800, 600), "My Game");
+
+// Cara 2: Dengan style options
+sf::RenderWindow window(sf::VideoMode(800, 600), "My Game", 
+                       sf::Style::Default);
+
+//Style options yang tersedia:
+//> sf::Style::Fullscreen   - Fullscreen mode
+//> sf::Style::Default      - Window dengan title bar
+//> sf::Style::Titlebar     - Cuma title bar
+//> sf::Style::Resize       - Window dapat di-resize
+//> sf::Style::Close        - Ada tombol close button</code></pre>
+                </div>
+
+                <h3>> Mengatur Properties Window:</h3>
+                <div class="code-block">
+                    <div class="code-label">[ C++ ] - Window Properties</div>
+                    <pre><code class="language-cpp">// Set title window
+layar.setTitle("Judul Baru");
+
+//set fps limit
+layar.setFramerateLimit(60); // 60 FPS
+
+//dapetin ukuran layar
+int width = layar.getSize().x;
+int height = layar.getSize().y;
+
+//cek jika layarnya udah kebuka
+if (layar.isOpen()) {
+    /* kode ... */
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Section 5: Graphics -->
+            <section class="article-section" id="graphics">
+                <h2>[ 05 ] GRAPHICS & DRAWING</h2>
+                <p>Sekarang mari kita belajar menggambar shapes dan graphics di window SFML!</p>
+
+                <h3>> Menggambar Shapes:</h3>
+                <div class="code-block">
+                    <div class="code-label">[ C++ ] - Drawing Shapes</div>
+                    <pre><code class="language-cpp">#include &lt;SFML/Graphics.hpp&gt;
+
+int main() {
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Shapes");
+    
+    //bikin persegi
+    sf::RectangleShape rectangle(sf::Vector2f(200, 100));
+    rectangle.setFillColor(sf::Color::Green);
+    rectangle.setPosition(100, 100);
+    
+    //bikin lingkaran
+    sf::CircleShape circle(50.f);
+    circle.setFillColor(sf::Color::Red);
+    circle.setPosition(400, 200);
+    
+    while (layar.isOpen()) {
+        sf::Event event;
+        while (layar.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                layar.close();
+            }
+        }
+        
+        layar.clear(sf::Color::Black);
+        layar.draw(rectangle);
+        layar.draw(circle);
+        layar.display();
+    }
+    
+    return 0;
+}</code></pre>
+                </div>
+
+                <h3>> Available Shapes:</h3>
+                <ul>
+                    <li><strong>sf::RectangleShape</strong> - Persegi panjang</li>
+                    <li><strong>sf::CircleShape</strong> - Lingkaran</li>
+                    <li><strong>sf::ConvexShape</strong> - Polygon kustom</li>
+                    <li><strong>sf::VertexArray</strong> - Vertices custom</li>
+                </ul>
+            </section>
+
+            <!-- Section 6: Input -->
+            <section class="article-section" id="input">
+                <h2>[ 06 ] INPUT HANDLING</h2>
+                <p>Game interaktif memerlukan input dari user. Mari belajar handle keyboard, mouse, dan events lainnya!</p>
+
+                <h3>> Keyboard Input:</h3>
+                <div class="code-block">
+                    <div class="code-label">[ C++ ] - Keyboard Input</div>
+                    <pre><code class="language-cpp">while (layar.isOpen()) {
+    sf::Event event;
+    while (layar.pollEvent(event)) {
+        if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::Up) {
+                //tombol Up diteken
+            }
+            if (event.key.code == sf::Keyboard::Space) {
+                //tombol Space ditekan
+            }
+        }
+        
+        if (event.type == sf::Event::Closed) {
+            layar.close();
+        }
+    }
+}</code></pre>
+                </div>
+
+                <h3>> Mouse Input:</h3>
+                <div class="code-block">
+                    <div class="code-label">[ C++ ] - Mouse Input</div>
+                    <pre><code class="language-cpp">while (layar.isOpen()) {
+    sf::Event event;
+    while (layar.pollEvent(event)) {
+        if (event.type == sf::Event::MouseButtonPressed) {
+            if (event.mouseButton.button == sf::Mouse::Left) {
+                //mouse kiri diklik
+                int x = event.mouseButton.x;
+                int y = event.mouseButton.y;
+            }
+        }
+        
+        if (event.type == sf::Event::MouseMoved) {
+            //mouse bergerak
+            int x = event.mouseMove.x;
+            int y = event.mouseMove.y;
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="info-box">
+                    <p class="info-title">[ TIP ]</p>
+                    <p>Ada dua cara handle input di SFML: Event-based (pollEvent) untuk response cepat, dan state-based (isKeyPressed) untuk continuous input!</p>
+                </div>
+            </section>
+
+            <!-- Section 7: Tips -->
+            <section class="article-section" id="tips">
+                <h2>[ 07 ] TIPS & TRICKS</h2>
+                <p>Beberapa tips berguna untuk develop game dengan SFML:</p>
+
+                <h3>> Game Loop Structure:</h3>
+                <div class="code-block">
+                    <div class="code-label">[ C++ ] - Good Game Loop</div>
+                    <pre><code class="language-cpp">sf::Clock clock;
+
+while (layar.isOpen()) {
+    float deltaTime = clock.restart().asSeconds();
+    
+    //handle input
+    sf::Event event;
+    while (layar.pollEvent(event)) {
+        // ...events
+    }
+    
+    //update game dari fungsi logikamu
+    update(deltaTime);
+    
+    //render
+    layar.clear(sf::Color::Black);
+    render(window);
+    layar.display();
+}</code></pre>
+                </div>
+
+                <h3>> Best Practices:</h3>
+                <ul>
+                    <li>Selalu gunakan deltaTime untuk smooth animation</li>
+                    <li>Set frame rate limit untuk consistent performance</li>
+                    <li>Organise code Anda ke dalam functions/classes</li>
+                    <li>Test di berbagai platform jika possible</li>
+                    <li>Baca dokumentasi SFML untuk fitur advanced</li>
+                </ul>
+
+                <div class="info-box warning">
+                    <p class="info-title">[ COMMON MISTAKES ]</p>
+                    <p>Jangan lupa close window dengan benar dan handle memory allocation dengan proper! Memory leak bisa menghambat performance game Anda.</p>
+                </div>
+
+                <h3>> Resources Berguna:</h3>
+                <ul>
+                    <li>Official SFML Documentation: https://www.sfml-dev.org/documentation.php</li>
+                    <li>GitHub SFML: https://github.com/SFML/SFML</li>
+                    <li>Community Forum: https://en.sfml-dev.org/forums/</li>
+                    <li>Tutorial YouTube: Search "SFML 3.0 Tutorial"</li>
+                </ul>
+            </section>
+
+            <!-- Conclusion -->
+            <div class="article-section">
+                <h2>[ KESIMPULAN ]</h2>
+                <p>Selamat! Anda sudah mempelajari dasar-dasar SFML 3.0. Sekarang saatnya untuk experiment dan membuat game Anda sendiri! Mulai dari yang simple seperti Pong atau Snake, kemudian tingkatkan complexity seiring dengan skill Anda bertambah.</p>
+                <p>Ingat, programming adalah pembelajaran yang berkelanjutan. Jangan takut untuk membuat error, karena dari error tersebut Anda akan belajar lebih banyak!</p>
+                <p style="margin-top: 20px;"><strong>Happy Coding! 🎮</strong></p>
+            </div>
+
+            <!-- Navigation -->
+            <div class="article-nav">
+                <a href="/#artikel" class="nav-link">
+                    <h4>[ ← BACK ]</h4>
+                    <p>Kembali ke Artikel List</p>
+                </a>
+                <a href="#intro" class="nav-link">
+                    <h4>[ ↑ TOP ]</h4>
+                    <p>Ke Awal Halaman</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
+
+        document.querySelectorAll('.toc a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
