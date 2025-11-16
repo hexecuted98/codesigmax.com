@@ -4,402 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SFML 3.0 Tutorial - CodeSigmaX</title>
-    <!-- Highlight.js CDN -->
+    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <style>
-        @font-face {
-            font-family: 'Retro';
-            src: url('https://fonts.gstatic.com/s/pressstart2p/v15/e3t5euO_Wr1mefEsqouVsbO3LdcOqFQTwuEm.woff2') format('woff2');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            font-family: 'Retro', monospace;
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            background-image: 
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.05) 2px, rgba(255, 255, 255, 0.05) 4px),
-                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.05) 2px, rgba(255, 255, 255, 0.05) 4px),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23000" width="100" height="100"/><circle cx="20" cy="20" r="2" fill="%23333"/><circle cx="50" cy="50" r="2" fill="%23333"/><circle cx="80" cy="80" r="2" fill="%23333"/><circle cx="80" cy="20" r="2" fill="%23333"/></svg>');
-            background-attachment: fixed;
-            background-size: 100%, 100%, 100px 100px;
-            min-height: 100vh;
-            color: #00ff41;
-            image-rendering: pixelated;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-
-        /* Navbar */
-        .navbar {
-            background: linear-gradient(90deg, #00ff41 0%, #00d4ff 100%);
-            padding: 15px 0;
-            box-shadow: 0 8px 20px rgba(0, 255, 65, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.5);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border: 3px solid #000;
-            border-bottom: 6px solid #000;
-        }
-
-        nav ul {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            list-style: none;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        #title {
-            font-family: 'Retro', monospace;
-            font-size: 2rem;
-            color: #000;
-            text-shadow: 4px 4px 0px rgba(0, 255, 65, 0.5), 8px 8px 0px rgba(0, 212, 255, 0.3);
-            letter-spacing: 3px;
-            font-weight: bold;
-        }
-
-        nav a {
-            color: #000;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: bold;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 3px solid #000;
-            transition: all 0.1s ease;
-            text-shadow: none;
-            box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5);
-        }
-
-        nav a:hover {
-            background: #ffff00;
-            transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.5);
-        }
-
-        nav a:active {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
-        }
-
-        @media (max-width: 768px) {
-            nav ul {
-                justify-content: center;
-                gap: 8px;
-            }
-
-            #title {
-                font-size: 1.3rem;
-                width: 100%;
-                text-align: center;
-                margin-bottom: 10px;
-            }
-
-            nav a {
-                font-size: 0.7rem;
-                padding: 6px 8px;
-            }
-        }
-
-        /* Main Content */
-        .content {
-            padding: 40px 20px;
-        }
-
-        .article-header {
-            background: #16213e;
-            border: 3px solid #00ff41;
-            padding: 30px;
-            margin-bottom: 40px;
-            box-shadow: 8px 8px 0px #00d4ff;
-        }
-
-        .article-header h1 {
-            color: #ffff00;
-            font-size: 2rem;
-            text-shadow: 2px 2px 0px #000;
-            margin-bottom: 15px;
-        }
-
-        .article-header p {
-            color: #00ff41;
-            font-size: 0.95rem;
-            text-shadow: 1px 1px 0px #000;
-            margin-bottom: 10px;
-        }
-
-        .meta-info {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #00d4ff;
-        }
-
-        .meta-item {
-            color: #00d4ff;
-            font-size: 0.85rem;
-            text-shadow: 1px 1px 0px #000;
-        }
-
-        /* Table of Contents */
-        .toc {
-            background: #16213e;
-            border: 3px solid #00d4ff;
-            padding: 20px;
-            margin-bottom: 40px;
-            box-shadow: 6px 6px 0px #00ff41;
-        }
-
-        .toc h3 {
-            color: #ffff00;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 0px #000;
-        }
-
-        .toc ul {
-            list-style: none;
-        }
-
-        .toc li {
-            margin-bottom: 8px;
-        }
-
-        .toc a {
-            color: #00ff41;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-
-        .toc a:hover {
-            color: #ffff00;
-            text-shadow: 2px 2px 0px #000;
-        }
-
-        /* Article Sections */
-        .article-section {
-            background: #16213e;
-            border: 3px solid #00ff41;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 6px 6px 0px rgba(0, 212, 255, 0.5);
-        }
-
-        .article-section h2 {
-            color: #ffff00;
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 0px #000;
-            border-bottom: 3px solid #00d4ff;
-            padding-bottom: 10px;
-        }
-
-        .article-section h3 {
-            color: #00ff41;
-            font-size: 1.2rem;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 0px #000;
-        }
-
-        .article-section p {
-            color: #00ff41;
-            font-size: 0.95rem;
-            line-height: 1.8;
-            margin-bottom: 15px;
-            text-shadow: 1px 1px 0px #000;
-        }
-
-        .article-section ul {
-            list-style: none;
-            margin-bottom: 15px;
-        }
-
-        .article-section li {
-            color: #00ff41;
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            padding-left: 20px;
-            text-shadow: 1px 1px 0px #000;
-            position: relative;
-        }
-
-        .article-section li:before {
-            content: "->";
-            position: absolute;
-            left: 0;
-            color: #00d4ff;
-        }
-
-        /* Code Block */
-        .code-block {
-            background: #0f1419;
-            border: 3px solid #00d4ff;
-            padding: 0;
-            margin: 20px 0;
-            overflow: hidden;
-            box-shadow: 5px 5px 0px rgba(0, 212, 255, 0.3);
-        }
-
-        .code-label {
-            background: #00d4ff;
-            color: #000;
-            padding: 8px 15px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
-        }
-
-        .hljs {
-            padding: 15px;
-            background: #0f1419 !important;
-            color: #00ff41 !important;
-            font-size: 0.9rem;
-            overflow-x: auto;
-        }
-
-        .hljs-attr {
-            color: #00d4ff !important;
-        }
-
-        .hljs-string {
-            color: #ffff00 !important;
-        }
-
-        .hljs-literal {
-            color: #ff6b9d !important;
-        }
-
-        .hljs-number {
-            color: #4ecdc4 !important;
-        }
-
-        .hljs-function {
-            color: #00ff41 !important;
-        }
-
-        /* Info Box */
-        .info-box {
-            background: #16213e;
-            border-left: 5px solid #00ff41;
-            border: 3px solid #00ff41;
-            padding: 15px;
-            margin: 20px 0;
-            box-shadow: 4px 4px 0px rgba(0, 255, 65, 0.2);
-        }
-
-        .info-box.warning {
-            border: 3px solid #ffff00;
-            border-left: 5px solid #ffff00;
-            box-shadow: 4px 4px 0px rgba(255, 255, 0, 0.2);
-        }
-
-        .info-box.error {
-            border: 3px solid #ff6b9d;
-            border-left: 5px solid #ff6b9d;
-            box-shadow: 4px 4px 0px rgba(255, 107, 157, 0.2);
-        }
-
-        .info-box p {
-            color: #00ff41;
-            font-size: 0.95rem;
-            text-shadow: 1px 1px 0px #000;
-            margin: 0;
-        }
-
-        .info-box.warning p {
-            color: #ffff00;
-        }
-
-        .info-box.error p {
-            color: #ff6b9d;
-        }
-
-        .info-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        /* Navigation Links */
-        .article-nav {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            margin-top: 40px;
-        }
-
-        .nav-link {
-            flex: 1;
-            background: #16213e;
-            border: 3px solid #00ff41;
-            padding: 20px;
-            text-decoration: none;
-            box-shadow: 5px 5px 0px rgba(0, 255, 65, 0.2);
-            transition: all 0.1s ease;
-        }
-
-        .nav-link:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 7px 7px 0px rgba(0, 255, 65, 0.2);
-        }
-
-        .nav-link h4 {
-            color: #00d4ff;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-        }
-
-        .nav-link p {
-            color: #00ff41;
-            font-size: 0.95rem;
-        }
-
-        @media (max-width: 768px) {
-            .article-header h1 {
-                font-size: 1.4rem;
-            }
-
-            .article-section h2 {
-                font-size: 1.2rem;
-            }
-
-            .article-nav {
-                flex-direction: column;
-            }
-
-            .hljs {
-                font-size: 0.8rem;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <header class="navbar" id="navbar">
             <nav>
-                <ul>
-                    <h2 id="title">CODESIGMAX</h2>
-                    <li><a href="/index.html#artikel">ARTIKEL</a></li>
-                    <li><a href="/index.html#developer">DEV</a></li>
-                    <li><a href="/index.html#tentang">ABOUT</a></li>
-                    <li><a href="/test.cpp">KONTAK</a></li>
+                <h2 id="title">CODESIGMAX</h2>
+                <button class="menu-toggle" id="menuToggle">☰ MENU</button>
+                <ul id="navMenu">
+                    <li><a href="#artikel">ARTIKEL</a></li>
+                    <li><a href="#developer">DEV</a></li>
+                    <li><a href="#tentang">ABOUT</a></li>
+                    <li><a href="#kontak">KONTAK</a></li>
                 </ul>
             </nav>
         </header>
@@ -749,12 +368,45 @@ while (layar.isOpen()) {
     </div>
 
     <script>
-        document.querySelectorAll('pre code').forEach((block) => {
-            hljs.highlightElement(block);
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+
+        menuToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+            menuToggle.classList.toggle('active');
         });
 
-        document.querySelectorAll('.toc a').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+        document.querySelectorAll('#navMenu a').forEach(link => {
+            link.addEventListener('click', function() {
+                navMenu.classList.remove('active');
+                menuToggle.classList.remove('active');
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('nav')) {
+                navMenu.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            const texts = ['crot'];
+            const randomText = texts[Math.floor(Math.random() * texts.length)];
+            
+            const burst = document.createElement('div');
+            burst.className = 'burst';
+            burst.textContent = randomText;
+            burst.style.left = e.clientX + 'px';
+            burst.style.top = e.clientY + 'px';
+            
+            document.body.appendChild(burst);
+            
+            setTimeout(() => burst.remove(), 1500);
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
@@ -762,6 +414,12 @@ while (layar.isOpen()) {
                 }
             });
         });
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            alert('hayooo');
+            event.target.reset();
+        }
     </script>
 </body>
 </html>
