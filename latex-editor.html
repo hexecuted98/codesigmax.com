@@ -1,0 +1,307 @@
+<!doctypehtml>
+<html lang=id>
+<head>
+<meta charset=UTF-8>
+<meta content="width=device-width,initial-scale=1"name=viewport>
+<title>LaTeX Editor - CodeSigmaX</title>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js></script>
+<script>
+let isProcessing = false;
+
+        function updatePreview() {
+            const latexCode = document.getElementById('latex-input').value;
+            const previewFrame = document.getElementById('preview-frame');
+            const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+            
+            previewDoc.open();
+            previewDoc.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"><\/script>
+                    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"><\/script>
+                    <style>
+                        body { 
+                            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; 
+                            padding: 20px;
+                            line-height: 1.6;
+                            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                            min-height: 100vh;
+                            margin: 0;
+                        }
+                        .math-container {
+                            background-color: white;
+                            padding: 20px;
+                            border-radius: 12px;
+                            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                            color: #333;
+                            max-width: 100%;
+                            overflow-x: auto;
+                        }
+                        .loading {
+                            text-align: center;
+                            padding: 15px;
+                            color: #666;
+                            font-size: 14px;
+                        }
+                        @media (max-width: 768px) {
+                            body {
+                                padding: 15px;
+                            }
+                            .math-container {
+                                padding: 15px;
+                                font-size: 14px;
+                            }
+                        }
+                        @media (max-width: 480px) {
+                            body {
+                                padding: 10px;
+                            }
+                            .math-container {
+                                padding: 12px;
+                                font-size: 13px;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="math-container">
+                        ${latexCode}
+                    </div>
+                    <div id="mathjax-loading" class="loading">Merender persamaan matematika...</div>
+                    <script>
+                        window.MathJax = {
+                            tex: {
+                                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+                            },
+                            svg: {
+                                fontCache: 'global'
+                            },
+                            startup: {
+                                pageReady: function() {
+                                    return MathJax.startup.defaultPageReady().then(function() {
+                                        document.getElementById('mathjax-loading').style.display = 'none';
+                                    });
+                                }
+                            }
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            previewDoc.close();
+        }
+
+        function insertTemplate(template) {
+            const textarea = document.getElementById('latex-input');
+            const templates = {
+                equation: '$$\\boxed{E = mc^2}$$\n\nIni adalah persamaan terkenal Einstein.',
+                matrix: '$$\\begin{pmatrix}\n  1 & 2 & 3 \\\\\n  4 & 5 & 6 \\\\\n  7 & 8 & 9\n\\end{pmatrix}$$',
+                integral: '$$\\int_{a}^{b} f(x)\\,dx = F(b) - F(a)$$',
+                fraction: '$$\\frac{a}{b} + \\frac{c}{d} = \\frac{ad + bc}{bd}$$'
+            };
+            textarea.value = templates[template];
+            updatePreview();
+        }
+
+        function downloadLatex() {
+            const latexCode = document.getElementById('latex-input').value;
+            const blob = new Blob([latexCode], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'latex-document.tex';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function uploadLatex(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('latex-input').value = e.target.result;
+                    updatePreview();
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        async function exportToPDF() {
+            if (isProcessing) return;
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            isProcessing = true;
+            btn.disabled = true;
+            btn.textContent = '⏳ Memproses...';
+            
+            try {
+                const element = document.getElementById('preview-frame').contentDocument.body;
+                const opt = {
+                    margin: 10,
+                    filename: 'latex-document.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+                };
+                await html2pdf().set(opt).from(element).save();
+            } catch(e) {
+                alert('Gagal mengekspor PDF: ' + e.message);
+                console.error(e);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+                isProcessing = false;
+            }
+        }
+
+        async function exportToImage(format) {
+            if (isProcessing) return;
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            isProcessing = true;
+            btn.disabled = true;
+            btn.textContent = '⏳ Memproses...';
+            
+            try {
+                const canvas = await html2canvas(document.getElementById('preview-frame').contentDocument.body, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    useCORS: true,
+                    logging: false
+                });
+                
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL(`image/${format}`);
+                link.download = `latex-document.${format}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch(e) {
+                alert(`Gagal mengekspor ${format.toUpperCase()}: ` + e.message);
+                console.error(e);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+                isProcessing = false;
+            }
+        }
+
+        function clearEditor() {
+            if (confirm('Apakah Anda yakin ingin menghapus semua konten?')) {
+                document.getElementById('latex-input').value = '';
+                updatePreview();
+            }
+        }
+
+        function toggleFullscreen() {
+            const container = document.querySelector('.editor-container');
+            if (!document.fullscreenElement) {
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function toggleMobileView() {
+            const editorSection = document.querySelector('.input-section');
+            const previewSection = document.querySelector('.preview-section');
+            const toggleBtn = document.querySelector('.mobile-toggle');
+            
+            if (editorSection.style.display === 'none') {
+                editorSection.style.display = 'flex';
+                previewSection.style.display = 'none';
+                toggleBtn.textContent = '👁️ Lihat Pratinjau';
+            } else {
+                editorSection.style.display = 'none';
+                previewSection.style.display = 'flex';
+                toggleBtn.textContent = '✏️ Kembali ke Editor';
+            }
+        }
+
+        window.onload = function() {
+            updatePreview();
+            
+            document.addEventListener('fullscreenchange', function() {
+                const fullscreenBtn = document.querySelector('.fullscreen-btn');
+                if (document.fullscreenElement) {
+                    fullscreenBtn.textContent = '⤵️ Keluar Layar Penuh';
+                } else {
+                    fullscreenBtn.textContent = '⤴️ Layar Penuh';
+                }
+            });
+
+            if (window.innerWidth <= 768) {
+                document.querySelector('.preview-section').style.display = 'none';
+            }
+        };
+</script>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,#667eea 0,#764ba2 100%);min-height:100vh;padding:15px;color:#333}.container{max-width:1400px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;backdrop-filter:blur(10px)}header{background:linear-gradient(135deg,#667eea 0,#764ba2 100%);color:#fff;padding:25px 20px;text-align:center;position:relative;overflow:hidden}header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.1);backdrop-filter:blur(10px)}header>*{position:relative;z-index:1}h1{font-size:2rem;margin-bottom:8px;font-weight:700;letter-spacing:-.5px}.subtitle{font-size:1rem;opacity:.95;font-weight:300}.editor-container{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:25px;min-height:600px}.section{display:flex;flex-direction:column;gap:15px;min-height:500px}h2{font-size:1.3rem;color:#667eea;font-weight:600;display:flex;align-items:center;gap:10px}h2::before{content:'';width:4px;height:24px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:2px}textarea{flex:1;padding:18px;border:2px solid #e0e0e0;border-radius:10px;font-family:'Fira Code','Courier New',monospace;font-size:16px;resize:none;transition:all .3s ease;background:#fafafa;color:#333;min-height:300px}textarea:focus{outline:0;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.1);background:#fff}iframe{flex:1;border:2px solid #e0e0e0;border-radius:10px;background:#fff;transition:all .3s ease;min-height:300px}iframe:focus{border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,.1)}.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}.mobile-controls{display:none}.file-upload-label,button{padding:12px 10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all .3s ease;display:flex;align-items:center;justify-content:center;gap:6px;text-transform:uppercase;letter-spacing:.3px;min-height:44px}.file-upload-label:hover,button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.15)}button:disabled{opacity:.6;cursor:not-allowed;transform:none!important;box-shadow:none!important}.template-btn{background:linear-gradient(135deg,#13547a 0,#80d0c7 100%);color:#fff}.download-btn{background:linear-gradient(135deg,#fa709a 0,#fee140 100%);color:#fff}.export-btn{background:linear-gradient(135deg,#667eea 0,#764ba2 100%);color:#fff}.upload-btn{background:linear-gradient(135deg,#a8edea 0,#fed6e3 100%);color:#fff}.utility-btn{background:linear-gradient(135deg,#ff9a9e 0,#fad0c4 100%);color:#fff}.mobile-toggle{background:linear-gradient(135deg,#667eea 0,#764ba2 100%);color:#fff;display:none}input[type=file]{display:none}.info-box{background:linear-gradient(135deg,rgba(102,126,234,.1) 0,rgba(118,75,162,.1) 100%);border-left:4px solid #667eea;padding:20px;margin:20px 25px 0;border-radius:10px;backdrop-filter:blur(10px)}.info-box h3{margin-bottom:12px;color:#667eea;font-size:1.05rem}.info-box ul{padding-left:20px;list-style:none}.info-box li{margin-bottom:8px;color:#555;position:relative;padding-left:20px}.info-box li::before{content:'✓';position:absolute;left:0;color:#667eea;font-weight:700}.info-box code{background:rgba(102,126,234,.2);padding:2px 6px;border-radius:4px;font-family:'Fira Code',monospace;color:#667eea}footer{text-align:center;padding:20px;color:#999;font-size:.9rem;border-top:1px solid #eee;background:#fafafa}.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:flex;justify-content:center;align-items:center;z-index:1000;color:#fff;font-size:1.2rem;flex-direction:column;gap:15px}.loading-spinner{width:50px;height:50px;border:5px solid rgba(255,255,255,.3);border-radius:50%;border-top-color:#fff;animation:spin 1s ease-in-out infinite}@keyframes spin{to{transform:rotate(360deg)}}@media (max-width:1024px){.editor-container{padding:20px;gap:15px}iframe,textarea{min-height:350px}}@media (max-width:768px){body{padding:10px}.container{border-radius:12px}header{padding:20px 15px}h1{font-size:1.7rem}.subtitle{font-size:.9rem}.editor-container{grid-template-columns:1fr;padding:15px;gap:15px;min-height:auto}.section{min-height:400px}.input-section,.preview-section{width:100%}.preview-section{display:none}.mobile-toggle{display:flex;margin-top:10px}iframe,textarea{min-height:350px;font-size:16px;padding:15px}.controls{grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.file-upload-label,button{padding:12px 8px;font-size:12px;min-height:44px}.info-box{margin:15px 15px 0;padding:15px}footer{padding:15px;font-size:.8rem}}@media (max-width:480px){body{padding:8px}header{padding:15px 10px}h1{font-size:1.5rem}.editor-container{padding:12px}iframe,textarea{min-height:300px;padding:12px;font-size:16px}.controls{grid-template-columns:repeat(2,1fr);gap:6px}.file-upload-label,button{padding:10px 6px;font-size:11px;min-height:42px}.info-box{margin:10px 10px 0;padding:12px}.info-box h3{font-size:1rem}.info-box li{font-size:.9rem}}@media (max-width:360px){.controls{grid-template-columns:1fr}.file-upload-label,button{min-height:40px}}</style>
+</head>
+<body>
+<div class=container>
+<header>
+<h1>LaTeX Editor | CodeSigmaX</h1>
+<p class=subtitle>Tulis, pratinjau, dan ekspor LaTeX dengan mudah</p>
+</header>
+<div class=editor-container>
+<div class="section input-section">
+<h2>Kode LaTeX</h2>
+<textarea id=latex-input oninput=updatePreview() placeholder="Ketik kode LaTeX Anda di sini...">
+$$\text{Proj}_{\vec{n}}(A) \cap \text{Proj}_{\vec{n}}(B) = \emptyset \implies \text{Tidak bertabrakan}$$
+                </textarea>
+<div class=controls>
+<button class=template-btn onclick='insertTemplate("equation")'>📐 Persamaan</button>
+<button class=template-btn onclick='insertTemplate("matrix")'>📊 Matriks</button>
+<button class=template-btn onclick='insertTemplate("integral")'>∫ Integral</button>
+<button class=template-btn onclick='insertTemplate("fraction")'>⁄ Pecahan</button>
+</div>
+<div class=controls>
+<button class=download-btn onclick=downloadLatex()>⬇️ TEX</button>
+<label class="file-upload-label upload-btn"for=file-upload>📂 Upload</label>
+<input accept=.tex id=file-upload onchange=uploadLatex(event) type=file>
+</div>
+<div class=controls>
+<button class=export-btn onclick=exportToPDF()>📄 PDF</button>
+<button class=export-btn onclick='exportToImage("png")'>🖼️ PNG</button>
+<button class=export-btn onclick='exportToImage("jpg")'>📷 JPG</button>
+</div>
+<div class=controls>
+<button class=utility-btn onclick=clearEditor()>🗑️ Hapus</button>
+<button class="utility-btn fullscreen-btn"onclick=toggleFullscreen()>⤴️ Layar Penuh</button>
+</div>
+<button class=mobile-toggle onclick=toggleMobileView()>👁️ Lihat Pratinjau</button>
+</div>
+<div class="section preview-section">
+<h2>Pratinjau</h2>
+<iframe id=preview-frame></iframe>
+<button class=mobile-toggle onclick=toggleMobileView()>✏️ Kembali ke Editor</button>
+</div>
+</div>
+<div class=info-box>
+<h3>💡 Tips Penggunaan:</h3>
+<ul>
+<li>Gunakan <code>$$...$$</code> atau <code>\[...\]</code> untuk persamaan terpisah</li>
+<li>Gunakan <code>$...$</code> atau <code>\(...\)</code> untuk persamaan dalam teks</li>
+<li>Klik tombol template untuk contoh cepat</li>
+<li>Ekspor PDF untuk dokumen profesional, PNG untuk kualitas tinggi, atau JPG untuk file lebih kecil</li>
+<li>Upload file .tex untuk mengedit dokumen yang sudah ada</li>
+<li>Gunakan mode layar penuh untuk fokus menulis</li>
+<li>Di perangkat mobile, gunakan tombol toggle untuk beralih antara editor dan pratinjau</li>
+</ul>
+</div>
+<footer>
+<p>LaTeX Editor CodeSigmax.Com| Powered by MathJax, html2canvas & html2pdf</p>
+</footer>
+</div>
